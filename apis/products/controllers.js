@@ -1,16 +1,16 @@
 let products = require("../../data");
 const Product = require("../../models/Product");
 
-const getAllProducts = async (req, res) => {
+const getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
     return res.json(products);
   } catch (error) {
-    return res.json(error);
+    return next(error);
   }
 };
 
-const getOneProduct = async (req, res) => {
+const getOneProduct = async (req, res, next) => {
   const id = req.params.id;
 
   // const product = products.find((product) => {
@@ -21,30 +21,34 @@ const getOneProduct = async (req, res) => {
     if (product) {
       return res.status(200).json(product);
     } else {
-      return res.status(404).json({ meg: "No product with such ID :( " });
+      return res.status(400).json({ meg: "No product with such ID :( " });
     }
   } catch (error) {
-    return res.status(error.status || 500).json(error);
+    return next(error);
   }
 };
 
-const createProduct = async (req, res) => {
+const createProduct = async (req, res, next) => {
   try {
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
+    console.log(req.body);
     const newProduct = await Product.create(req.body);
     return res.status(201).json(newProduct);
   } catch (error) {
-    return res.status(error.status || 500).json(error);
+    return next(error);
   }
 };
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res, next) => {
   const id = req.params.id;
 
   try {
     await Product.findByIdAndDelete(id);
     return res.status(204).end();
   } catch (error) {
-    return res.status(error.status || 500).json(error);
+    return next(error);
   }
 
   // const filteredProducts = products.filter((product) => {
@@ -59,13 +63,16 @@ const deleteProduct = async (req, res) => {
   // return res.json(filteredProducts);
 };
 
-const updateProduct = async (req, res) => {
+const updateProduct = async (req, res, next) => {
   const id = req.params.id;
   try {
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
     const updated = await Product.findByIdAndUpdate(id, req.body);
     return res.status(200).json(updated);
   } catch (error) {
-    return res.status(error.status || 500).json(error);
+    return next(error);
   }
 };
 

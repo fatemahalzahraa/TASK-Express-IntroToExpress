@@ -1,4 +1,5 @@
 const products = require("../../data");
+const upload = require("../../middlewares/multer");
 const {
   getAllProducts,
   getOneProduct,
@@ -15,10 +16,10 @@ productsRouter.get("/", getAllProducts);
 
 productsRouter.get("/:id", getOneProduct);
 
-productsRouter.post("/", createProduct);
+productsRouter.post("/", upload.single("image"), createProduct);
 
 productsRouter.delete("/:id", deleteProduct);
 
-productsRouter.put("/:id", updateProduct);
+productsRouter.put("/:id", upload.single("image"), updateProduct);
 
 module.exports = productsRouter;
